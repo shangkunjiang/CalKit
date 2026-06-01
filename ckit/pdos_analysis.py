@@ -352,14 +352,18 @@ class PDOSAnalyzer(BaseAnalyzer):
         if not selected_keys:
             return {}
 
+        # If orbitals is a single group letter (s, p, d, f), sum all matching entries
+        collapse = orbitals.strip().lower() in ("s", "p", "d", "f")
+
         # Build output dict: collapse same element+orbital across atoms
         result: Dict[str, Any] = {}
         for key in sorted(selected_keys):
-            # Extract element_orbital from key
-            # "Fe_1_dxy" → "Fe_dxy"
             parts = key.split("_")
             if len(parts) >= 3:
-                short_key = "%s_%s" % (parts[0], "_".join(parts[2:]))
+                if collapse:
+                    short_key = "%s_%s" % (parts[0], orbitals.strip())
+                else:
+                    short_key = "%s_%s" % (parts[0], "_".join(parts[2:]))
             else:
                 short_key = key
 
