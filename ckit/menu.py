@@ -95,6 +95,10 @@ def _run_analyzer(name: str) -> None:
         kwargs["orbitals"] = orbs
 
     analyzer.run(**kwargs)
+    if 'atoms' in kwargs and kwargs['atoms']:
+        analyzer._selected_atoms = kwargs['atoms'][0]
+    if 'orbitals' in kwargs:
+        analyzer._selected_orbs = kwargs['orbitals']
 
     if analyzer.errors:
         print("\n" + _ANSI_RED + "Errors:" + _ANSI_RESET)
@@ -105,8 +109,10 @@ def _run_analyzer(name: str) -> None:
     analyzer.print_summary()
 
     if hasattr(analyzer, "to_excel"):
+        sel = getattr(analyzer, '_selected_atoms', 'all')
+        orbs = getattr(analyzer, '_selected_orbs', 'all')
         out = "PDOS_USER.xlsx"
-        analyzer.to_excel(out)
+        analyzer.to_excel(out, selection=sel, orbitals=orbs)
         print(_ANSI_GREEN + "Exported to " + out + _ANSI_RESET)
 
     # txt export removed

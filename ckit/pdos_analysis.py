@@ -29,7 +29,8 @@ class PDOSAnalyzer(BaseAnalyzer):
         # PDOS data: key = "element_orbital", value = dict of spin→array
         self._pdos_data: Dict[str, Any] = {}
         self._atom_types: List[str] = []             # element names
-        self._atom_counts: List[int] = []            # count per element
+        self._atom_counts: List[int] = []
+        self._atom_map: Dict[str, List[int]] = {}            # count per element
         self._atom_elements: List[str] = []          # element per atom index
 
     # -- Public API -----------------------------------------------
@@ -206,6 +207,25 @@ class PDOSAnalyzer(BaseAnalyzer):
         self._atom_types = []
         self._atom_counts = []
 
+        # Try read POSCAR to map element names to atom indices
+        poscar_path = self.doscar.parent / "POSCAR"
+        if poscar_path.exists():
+            try:
+                with open(poscar_path, "r") as pf:
+                    plines = pf.readlines()
+                enames = plines[5].split()
+                ecounts = list(map(int, plines[6].split()))
+                idx = 1
+                self._atom_map = {}  # element -> list of atom indices
+                for ei, cnt in zip(enames, ecounts):
+                    if ei not in self._atom_map:
+                        self._atom_map[ei] = []
+                    for j in range(cnt):
+                        self._atom_map[ei].append(idx)
+                        idx += 1
+            except Exception:
+                self._atom_map = {}
+
         # Read atom counts from header if available
         # Standard DOSCAR with PDOS stores atom info in the header
 
@@ -303,9 +323,22 @@ class PDOSAnalyzer(BaseAnalyzer):
                 continue
             elem = parts[0]
 
-            if is_element and elem.lower() == token.lower():
-                if orbitals == "all" or any(o in key for o in orbitals.split()):
-                    selected_keys.append(key)
+            if is_element:
+                # Map element name to atom index using POSCAR
+                aidx = -1
+                try:
+                    aidx = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else -1
+                except ValueError:
+                    pass
+                if self._atom_map and aidx > 0:
+                    for el, indices in self._atom_map.items():
+                        if el.lower() == token.lower() and aidx in indices:
+                            if orbitals == "all" or any(o in key for o in orbitals.split()):
+                                selected_keys.append(key)
+                            break
+                elif elem.lower() == token.lower():
+                    if orbitals == "all" or any(o in key for o in orbitals.split()):
+                        selected_keys.append(key)
             elif not is_element:
                 # Numeric atom index
                 try:
