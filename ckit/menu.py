@@ -60,12 +60,12 @@ def _run_analyzer(name: str) -> None:
     directory = "."
     kwargs = {"directory": directory}
 
-    if name in ("force", "free", "energy", "mag"):
+    if name in ("Force", "FreeEn", "Energy", "MagMom"):
         kwargs["outcar_path"] = "OUTCAR"
-    if name == "bader":
+    if name == "Bader":
         kwargs["acf_path"] = "ACF.dat"
         kwargs["outcar_path"] = "OUTCAR"
-    if name == "pdos":
+    if name == "PDOS":
         kwargs["doscar_path"] = "DOSCAR"
         # Read POSCAR to show atom list
         poscar_path = os.path.join(directory, "POSCAR")

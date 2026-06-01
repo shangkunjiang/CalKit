@@ -21,7 +21,7 @@ from .pdos_analysis import PDOSAnalyzer
 # ── Command registry ──────────────────────────────────────────
 
 COMMANDS = {
-    "force": {
+    "Force": {
         "class": ForceConvergenceAnalyzer,
         "help": "Force convergence analysis",
         "run_kwargs": lambda a: {"outcar_path": a.outcar, "directory": a.directory},
@@ -30,7 +30,7 @@ COMMANDS = {
             p.add_argument("--directory", default=".", help="VASP directory"),
         ),
     },
-    "bader": {
+    "Bader": {
         "class": BaderAnalyzer,
         "help": "Bader charge analysis",
         "run_kwargs": lambda a: {"acf_path": a.acf, "outcar_path": a.outcar, "directory": a.directory},
@@ -41,7 +41,7 @@ COMMANDS = {
             p.add_argument("--excel", default="", help="Export to Excel"),
         ),
     },
-    "free": {
+    "FreeEn": {
         "class": FreeEnergyAnalyzer,
         "help": "Free energy analysis",
         "run_kwargs": lambda a: {"outcar_path": a.outcar, "directory": a.directory},
@@ -51,9 +51,9 @@ COMMANDS = {
             p.add_argument("--output", default="", help="Write to file"),
         ),
     },
-    "pdos": {
+    "PDOS": {
         "class": PDOSAnalyzer,
-        "help": "PDOS analysis (VASPKIT 115)",
+        "help": "Projected Density of States",
         "run_kwargs": lambda a: {"doscar_path": a.doscar, "directory": a.directory},
         "add_args": lambda p: (
             p.add_argument("--doscar", default="", help="DOSCAR path"),
@@ -62,7 +62,7 @@ COMMANDS = {
             p.add_argument("--excel", default="", help="Export to Excel"),
         ),
     },
-    "mag": {
+    "MagMom": {
         "class": MagneticMomentAnalyzer,
         "help": "Magnetic moment analysis",
         "run_kwargs": lambda a: {"outcar_path": a.outcar, "directory": a.directory},
@@ -72,7 +72,7 @@ COMMANDS = {
             p.add_argument("--excel", default="", help="Export to Excel"),
         ),
     },
-    "energy": {
+    "Energy": {
         "class": EnergyExtractor,
         "help": "Energy extraction",
         "run_kwargs": lambda a: {"outcar_path": a.outcar, "directory": a.directory},
