@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "CalKit"
+version = "0.4.0"
+authors = [
+    {name = "CalKit Developer"},
+]
+description = "CalKit — Multi-scale Computation Analysis Toolkit. A Python package for post-processing results from VASP, Materials Studio, LAMMPS, ABACUS, DeePkit and other computational chemistry/physics software. Includes force convergence, Bader charge, free energy, PDOS/d-band center, magnetic moment, and energy analysis. Supports interactive menu mode and CLI."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "matplotlib>=3.5.0",
+    "numpy>=1.21.0",
+    "openpyxl>=3.0.0",
+    "pandas>=1.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+]
+
+[project.scripts]
+calkit = "ckit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ckit*"]
+
+[tool.setuptools.package-data]
+"ckit" = ["py.typed"]
