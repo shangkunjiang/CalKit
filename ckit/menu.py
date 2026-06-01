@@ -70,7 +70,10 @@ def _run_analyzer(name: str) -> None:
         kwargs["outcar_path"] = "OUTCAR"
     if name == "pdos":
         kwargs["doscar_path"] = "DOSCAR"
-        kwargs["procar_path"] = "PROCAR"
+        atoms = input("  Atoms: ").strip()
+        orbs = input("  Orbitals: ").strip() or "all"
+        kwargs["atoms"] = [atoms] if atoms else []
+        kwargs["orbitals"] = orbs
 
     analyzer.run(**kwargs)
 

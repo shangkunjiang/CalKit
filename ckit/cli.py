@@ -54,11 +54,11 @@ COMMANDS = {
     },
     "pdos": {
         "class": PDOSAnalyzer,
-        "help": "PDOS analysis",
-        "run_kwargs": lambda a: {"doscar_path": a.doscar, "procar_path": a.procar, "directory": a.directory},
+        "help": "PDOS analysis (VASPKIT 115)",
+        "run_kwargs": lambda a: {"doscar_path": a.doscar, "directory": a.directory},
         "add_args": lambda p: (
             p.add_argument("--doscar", default="", help="DOSCAR path"),
-            p.add_argument("--procar", default="", help="PROCAR path"),
+            
             p.add_argument("--directory", default=".", help="VASP directory"),
             p.add_argument("--excel", default="", help="Export to Excel"),
         ),
