@@ -82,6 +82,8 @@ COMMANDS = {
             "directory": a.directory,
             "sigma": getattr(a, "sigma", 0.05),
             "nedos": getattr(a, "nedos", 2000),
+            "emin": getattr(a, "emin", -20.0),
+            "emax": getattr(a, "emax", 10.0),
         },
         "add_args": lambda p: (
             p.add_argument("--eigenval", default="", help="EIGENVAL path"),
@@ -89,6 +91,8 @@ COMMANDS = {
             p.add_argument("--directory", default=".", help="VASP directory"),
             p.add_argument("--sigma", type=float, default=0.05, help="Smearing width (eV)"),
             p.add_argument("--nedos", type=int, default=2000, help="Energy grid points"),
+            p.add_argument("--emin", type=float, default=-20.0, help="Energy min (eV)"),
+            p.add_argument("--emax", type=float, default=10.0, help="Energy max (eV)"),
             p.add_argument("--excel", default="", help="Export to Excel"),
             p.add_argument("--output", default="", help="Write TDOS.dat"),
         ),
