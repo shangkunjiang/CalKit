@@ -206,7 +206,6 @@ class BaderAnalyzer(BaseAnalyzer):
                     break
 
         # Build element + zval map
-        print("#", zvals, file=_sys.stderr)
         if potcar_types and ion_counts and len(potcar_types) == len(ion_counts):
             idx = 1
             for i, (el, cnt) in enumerate(zip(potcar_types, ion_counts)):
