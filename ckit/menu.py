@@ -60,7 +60,7 @@ def _run_analyzer(name: str) -> None:
     directory = "."
     kwargs = {"directory": directory}
 
-    if name in ("Force", "FreeEn", "Energy", "MagMom", "BandCenter"):
+    if name in ("Force", "FreeEn", "Energy", "MagMom"):
         kwargs["outcar_path"] = "OUTCAR"
     if name == "Bader":
         kwargs["acf_path"] = "ACF.dat"
