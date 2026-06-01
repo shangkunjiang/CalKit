@@ -15,6 +15,7 @@ from .energy import EnergyExtractor
 from .force_convergence import ForceConvergenceAnalyzer
 from .free_energy import FreeEnergyAnalyzer
 from .magnetic_moment import MagneticMomentAnalyzer
+from .dos_eigenval import DOSEigenvalAnalyzer
 from .pdos_analysis import PDOSAnalyzer
 
 
@@ -70,6 +71,26 @@ COMMANDS = {
             p.add_argument("--outcar", default="", help="OUTCAR path"),
             p.add_argument("--directory", default=".", help="VASP directory"),
             p.add_argument("--excel", default="", help="Export to Excel"),
+        ),
+    },
+    "dos": {
+        "class": DOSEigenvalAnalyzer,
+        "help": "DOS from EIGENVAL (Gaussian smearing)",
+        "run_kwargs": lambda a: {
+            "eigenval_path": a.eigenval,
+            "outcar_path": a.outcar,
+            "directory": a.directory,
+            "sigma": getattr(a, "sigma", 0.05),
+            "nedos": getattr(a, "nedos", 2000),
+        },
+        "add_args": lambda p: (
+            p.add_argument("--eigenval", default="", help="EIGENVAL path"),
+            p.add_argument("--outcar", default="", help="OUTCAR path"),
+            p.add_argument("--directory", default=".", help="VASP directory"),
+            p.add_argument("--sigma", type=float, default=0.05, help="Smearing width (eV)"),
+            p.add_argument("--nedos", type=int, default=2000, help="Energy grid points"),
+            p.add_argument("--excel", default="", help="Export to Excel"),
+            p.add_argument("--output", default="", help="Write TDOS.dat"),
         ),
     },
     "energy": {

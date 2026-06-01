@@ -17,6 +17,7 @@ Modules:
 
 from .base import BaseAnalyzer
 from .bader_analysis import BaderAnalyzer
+from .dos_eigenval import DOSEigenvalAnalyzer
 from .config import load_config, save_config
 from .energy import EnergyExtractor
 from .force_convergence import ForceConvergenceAnalyzer
