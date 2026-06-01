@@ -111,7 +111,7 @@ def _run_analyzer(name: str) -> None:
     if hasattr(analyzer, "to_excel"):
         sel = getattr(analyzer, '_selected_atoms', '')
         orbs = getattr(analyzer, '_selected_orbs', 'all')
-        out = "PDOS_USER.xlsx"
+        out = name + ".xlsx"
         if sel:
             analyzer.to_excel(out, selection=sel, orbitals=orbs)
         else:
