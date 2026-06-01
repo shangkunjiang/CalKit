@@ -109,10 +109,8 @@ def _run_analyzer(name: str) -> None:
     analyzer.print_summary()
 
     if hasattr(analyzer, "to_excel"):
-        sel = getattr(analyzer, '_selected_atoms', 'all')
-        orbs = getattr(analyzer, '_selected_orbs', 'all')
         out = "PDOS_USER.xlsx"
-        analyzer.to_excel(out, selection=sel, orbitals=orbs)
+        analyzer.to_excel(out)
         print(_ANSI_GREEN + "Exported to " + out + _ANSI_RESET)
 
     # txt export removed
