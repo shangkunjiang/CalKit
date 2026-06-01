@@ -65,13 +65,12 @@ def _run_analyzer(name: str) -> None:
     if name == "bader":
         kwargs["acf_path"] = "ACF.dat"
         kwargs["outcar_path"] = "OUTCAR"
-    if name == "dos":
-        kwargs["eigenval_path"] = "EIGENVAL"
-        kwargs["outcar_path"] = "OUTCAR"
     if name == "pdos":
         kwargs["doscar_path"] = "DOSCAR"
-        atoms = input("  Atoms: ").strip()
-        orbs = input("  Orbitals: ").strip() or "all"
+        print("  Free Format, e.g., Fe C H 1-4 7 8 24")
+        atoms = input("  Atoms (element or index): ").strip()
+        print("  s py pz px dxy dyz dz2 dxz dx2, or all")
+        orbs = input("  Orbitals (default: all): ").strip() or "all"
         kwargs["atoms"] = [atoms] if atoms else []
         kwargs["orbitals"] = orbs
 
