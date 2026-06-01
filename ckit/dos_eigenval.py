@@ -173,12 +173,14 @@ class DOSEigenvalAnalyzer(BaseAnalyzer):
             if line_idx >= len(lines):
                 break
 
-            # K-point line: kx ky kz weight
+            # K-point line: kx ky kz weight (skip any blank lines)
+            while line_idx < len(lines) and not lines[line_idx].split():
+                line_idx += 1
+            if line_idx >= len(lines):
+                break
+
             try:
                 ktokens = lines[line_idx].split()
-                if not ktokens:
-                    line_idx += 1
-                    continue
                 if len(ktokens) >= 4:
                     weight = float(ktokens[3])
                 else:
