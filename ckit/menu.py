@@ -67,6 +67,26 @@ def _run_analyzer(name: str) -> None:
         kwargs["outcar_path"] = "OUTCAR"
     if name == "pdos":
         kwargs["doscar_path"] = "DOSCAR"
+        # Read POSCAR to show atom list
+        poscar_path = os.path.join(directory, "POSCAR")
+        if os.path.exists(poscar_path):
+            try:
+                with open(poscar_path, "r") as pf:
+                    plines = pf.readlines()
+                enames = plines[5].split()
+                ecounts = list(map(int, plines[6].split()))
+                idx = 1
+                print("  Atom list:")
+                for ei, cnt in zip(enames, ecounts):
+                    for j in range(cnt):
+                        print("    %3d: %-3s" % (idx, ei), end="")
+                        if idx % 5 == 0:
+                            print()
+                        idx += 1
+                if (idx - 1) % 5 != 0:
+                    print()
+            except Exception:
+                pass
         print("  Free Format, e.g., Fe C H 1-4 7 8 24")
         atoms = input("  Atoms (element or index): ").strip()
         print("  s py pz px dxy dyz dz2 dxz dx2, or all")
@@ -85,18 +105,11 @@ def _run_analyzer(name: str) -> None:
     analyzer.print_summary()
 
     if hasattr(analyzer, "to_excel"):
-        ans = input("Export to Excel? (y/n): ").strip().lower()
-        if ans == "y":
-            out = input("Output path (default: output.xlsx): ").strip() or "output.xlsx"
-            analyzer.to_excel(out)
-            print(_ANSI_GREEN + "Exported to " + out + _ANSI_RESET)
+        out = "PDOS_USER.xlsx"
+        analyzer.to_excel(out)
+        print(_ANSI_GREEN + "Exported to " + out + _ANSI_RESET)
 
-    if hasattr(analyzer, "to_file"):
-        ans = input("Write to file? (y/n): ").strip().lower()
-        if ans == "y":
-            out = input("Output path (default: output.txt): ").strip() or "output.txt"
-            analyzer.to_file(out)
-            print(_ANSI_GREEN + "Written to " + out + _ANSI_RESET)
+    # txt export removed
 
 def main() -> None:
     items = _menu_items()
