@@ -22,6 +22,7 @@ from .energy import EnergyExtractor
 from .force_convergence import ForceConvergenceAnalyzer
 from .free_energy import FreeEnergyAnalyzer
 from .magnetic_moment import MagneticMomentAnalyzer
+from .band_center import BandCenterAnalyzer
 from .pdos_analysis import PDOSAnalyzer
 
 __version__ = "0.4.0"
@@ -30,6 +31,7 @@ __all__ = [
     "ForceConvergenceAnalyzer",
     "BaderAnalyzer",
     "FreeEnergyAnalyzer",
+    "BandCenterAnalyzer",
     "PDOSAnalyzer",
     "MagneticMomentAnalyzer",
     "EnergyExtractor",

@@ -60,11 +60,18 @@ def _run_analyzer(name: str) -> None:
     directory = "."
     kwargs = {"directory": directory}
 
-    if name in ("Force", "FreeEn", "Energy", "MagMom"):
+    if name in ("Force", "FreeEn", "Energy", "MagMom", "BandCenter"):
         kwargs["outcar_path"] = "OUTCAR"
     if name == "Bader":
         kwargs["acf_path"] = "ACF.dat"
         kwargs["outcar_path"] = "OUTCAR"
+    if name == "BandCenter":
+        kwargs["doscar_path"] = "DOSCAR"
+        print("  Free Format, e.g., Fe C H 1-4 7 8 24")
+        atoms = input("  Atoms (element or index): ").strip()
+        orbs = input("  Orbitals (default: d): ").strip() or "d"
+        kwargs["atoms"] = atoms
+        kwargs["orbitals"] = orbs
     if name == "PDOS":
         kwargs["doscar_path"] = "DOSCAR"
         # Read POSCAR to show atom list

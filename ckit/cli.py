@@ -15,6 +15,7 @@ from .energy import EnergyExtractor
 from .force_convergence import ForceConvergenceAnalyzer
 from .free_energy import FreeEnergyAnalyzer
 from .magnetic_moment import MagneticMomentAnalyzer
+from .band_center import BandCenterAnalyzer
 from .pdos_analysis import PDOSAnalyzer
 
 
@@ -68,6 +69,16 @@ COMMANDS = {
         "run_kwargs": lambda a: {"outcar_path": a.outcar, "directory": a.directory},
         "add_args": lambda p: (
             p.add_argument("--outcar", default="", help="OUTCAR path"),
+            p.add_argument("--directory", default=".", help="VASP directory"),
+            p.add_argument("--excel", default="", help="Export to Excel"),
+        ),
+    },
+    "BandCenter": {
+        "class": BandCenterAnalyzer,
+        "help": "Band center (d-band) analysis",
+        "run_kwargs": lambda a: {"doscar_path": a.doscar, "directory": a.directory},
+        "add_args": lambda p: (
+            p.add_argument("--doscar", default="", help="DOSCAR path"),
             p.add_argument("--directory", default=".", help="VASP directory"),
             p.add_argument("--excel", default="", help="Export to Excel"),
         ),
