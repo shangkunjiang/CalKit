@@ -2,8 +2,7 @@
 Band Center Analyzer — VASPKIT 503 replica.
 
 Calculates d-band center from PDOS data in DOSCAR.
-Formula: epsilon_d = \int E * DOS(E) dE / \int DOS(E) dE
-Integration range: from E_min to E_fermi (occupied states).
+Outputs spin-up, spin-down, and average band centers.
 """
 
 from pathlib import Path
@@ -12,7 +11,6 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 
 from .base import BaseAnalyzer
-# Reuse DOSCAR parser from PDOS module
 from .pdos_analysis import PDOSAnalyzer
 
 
@@ -24,21 +22,15 @@ class BandCenterAnalyzer(BaseAnalyzer):
         self._pdos = PDOSAnalyzer()
         self._results: List[Dict[str, Any]] = []
 
-    # -- Public API -------------------------------------------------
-
     def run(self, doscar_path: str = "", directory: str = ".",
             atoms: str = "", orbitals: str = "d") -> None:
-        """Run band center calculation."""
         self._pdos.doscar = self._resolve(doscar_path or "DOSCAR", directory)
         if not self._check_file(self._pdos.doscar, "DOSCAR"):
             return
-
         self._pdos._parse_doscar()
-
         if not atoms:
             self.errors.append("No atoms selected for band center")
             return
-
         self._compute_band_center(atoms, orbitals)
         self._ran = True
 
@@ -46,13 +38,16 @@ class BandCenterAnalyzer(BaseAnalyzer):
         if not self._ran:
             print("Run analysis first.")
             return
-        sep = "-" * 50
+        sep = "-" * 58
         print("\n" + sep)
         print("  Band Center Analysis")
         print(sep)
+        print("  %-12s %10s %10s %10s" % ("Label", "Up(eV)", "Down(eV)", "Avg(eV)"))
+        print("  " + "-" * 48)
         for r in self._results:
-            print("  %-12s  %10.4f eV  (Fermi: %.4f)" %
-                  (r["label"], r["center"], self._pdos._efermi))
+            print("  %-12s %10.4f %10.4f %10.4f" %
+                  (r["label"], r["center_up"], r["center_dn"], r["center_avg"]))
+        print("  Fermi level: %.4f eV" % self._pdos._efermi)
         print(sep + "\n")
 
     def to_excel(self, output: str, selection: str = "Fe",
@@ -61,74 +56,51 @@ class BandCenterAnalyzer(BaseAnalyzer):
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "BandCenter"
-        ws.append(["Label", "Band_Center(eV)", "E_Fermi(eV)", "DOS_Integral"])
+        ws.append(["Label", "Center_up(eV)", "Center_dn(eV)", "Center_avg(eV)", "E_Fermi(eV)"])
         for r in self._results:
-            ws.append([r["label"], r["center"],
-                       self._pdos._efermi, r["integral"]])
+            ws.append([r["label"], r["center_up"], r["center_dn"],
+                       r["center_avg"], self._pdos._efermi])
         wb.save(output)
 
-    # -- Computation -----------------------------------------------
-
     def _compute_band_center(self, atoms: str, orbitals: str) -> None:
-        """Calculate d-band center for selected atoms/orbitals.
-
-        band_center = \int_{E_min}^{E_fermi} E * DOS(E) dE /
-                      \int_{E_min}^{E_fermi} DOS(E) dE
-        """
         pdos_data = self._pdos._extract_pdos(atoms, orbitals)
         if not pdos_data:
             self.errors.append("No PDOS data for %s %s orbitals" % (atoms, orbitals))
             return
 
         energies = np.array(self._pdos._energies)
-        efermi = self._pdos._efermi
+
+        def _calc_center(e_occ, edos):
+            de = np.diff(e_occ)
+            dm = (edos[:-1] + edos[1:]) / 2.0
+            em = (e_occ[:-1] + e_occ[1:]) / 2.0
+            num = np.sum(em * dm * de)
+            den = np.sum(dm * de)
+            if abs(den) < 1e-10:
+                return 0.0
+            return num / den
 
         for key, data in sorted(pdos_data.items()):
-            # Sum spin-up + spin-down
             dos_up = np.array(data.get("up", []))
             dos_dn = np.array(data.get("dn", []))
-            dos_total = dos_up + dos_dn
-
-            if len(dos_total) == 0:
+            if len(dos_up) == 0:
                 continue
 
-            # Integrate over occupied states (E <= 0 relative to Fermi)
-            # energies are already aligned to E-fermi (E_fermi = 0)
-            # So occupied states: E <= 0
-
-            # Use all energies up to Fermi level
-            mask = energies <= 0.0  # occupied states
+            mask = energies <= 0.0
             if not np.any(mask):
-                # Fallback: use entire energy range
                 mask = np.ones(len(energies), dtype=bool)
 
             e_occ = energies[mask]
-            dos_occ = dos_total[mask]
-
-            # Trapezoidal integration
-            de = np.diff(e_occ)
-            dos_mid = (dos_occ[:-1] + dos_occ[1:]) / 2.0
-
-            numerator = np.sum(e_occ[:-1] * dos_mid * de)  # approximate
-            denominator = np.sum(dos_mid * de)
-
-            # More accurate: midpoint integration
-            e_mid = (e_occ[:-1] + e_occ[1:]) / 2.0
-            numerator = np.sum(e_mid * dos_mid * de)
-            denominator = np.sum(dos_mid * de)
-
-            if abs(denominator) < 1e-10:
-                center = 0.0
-            else:
-                center = numerator / denominator
+            c_up = _calc_center(e_occ, dos_up[mask])
+            c_dn = _calc_center(e_occ, dos_dn[mask])
+            c_avg = (c_up + c_dn) / 2.0 if self._pdos._ispin == 2 else c_up
 
             self._results.append({
                 "label": key,
-                "center": center,
-                "integral": denominator,
+                "center_up": c_up,
+                "center_dn": c_dn,
+                "center_avg": c_avg,
             })
-
-    # -- Properties ------------------------------------------------
 
     @property
     def results(self) -> List[Dict[str, Any]]:
