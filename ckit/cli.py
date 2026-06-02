@@ -55,10 +55,11 @@ COMMANDS = {
     "PDOS": {
         "class": PDOSAnalyzer,
         "help": "Projected Density of States",
-        "run_kwargs": lambda a: {"doscar_path": a.doscar, "directory": a.directory},
+        "run_kwargs": lambda a: {"doscar_path": a.doscar, "directory": a.directory, "atoms": [a.atoms] if getattr(a, "atoms", "") else [], "orbitals": getattr(a, "orbitals", "all")},
         "add_args": lambda p: (
             p.add_argument("--doscar", default="", help="DOSCAR path"),
-            
+            p.add_argument("--atoms", default="", help="Atoms (Fe, 63, 1-4)"),
+            p.add_argument("--orbitals", default="all", help="Orbitals (d, p, s, all)"),
             p.add_argument("--directory", default=".", help="VASP directory"),
             p.add_argument("--excel", default="", help="Export to Excel"),
         ),
