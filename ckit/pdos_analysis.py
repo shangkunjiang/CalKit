@@ -343,7 +343,7 @@ class PDOSAnalyzer(BaseAnalyzer):
                 # Numeric atom index
                 try:
                     aidx = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else -1
-                    if aidx == int(token) - 1 or str(aidx + 1) == token:
+                    if aidx == int(token):
                         if orbitals == "all" or any(o in key for o in orbitals.split()):
                             selected_keys.append(key)
                 except ValueError:
